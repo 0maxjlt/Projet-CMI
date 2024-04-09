@@ -15,32 +15,32 @@ def liste_fichiers_ext(rep):
 def copier_ou_deplacer(choix, fichier, nom_repertoire):
    
 
-    if choix == 0:
+    if choix == 2:
         os.system("mv '" + fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
     elif choix == 1:
         os.system("cp '" + fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
 
-def trier_par_extension(dest,src):
+def trier_par_extension(dest,src,choix):
 
     ext_a_trier= input("Entrez une ou des extensions de la forme '.ext' : ").split()
-    choix = int(input("Voulez vous : \n\t0 : Deplacer les fichiers \n\t1 : Copier les fichiers \nVotre réponse : "))
+
     liste_fichiers = liste_fichiers_ext(src)
     for fichier in liste_fichiers:
         for ext in ext_a_trier:
             if fichier[1] == ext:
                 copier_ou_deplacer(choix, fichier, dest)
 
-def trier_par_theme(dest,src,ext_a_trier):
-    choix = int(input("Voulez vous : \n\t0 : Deplacer les fichiers \n\t1 : Copier les fichiers \nVotre réponse : "))
+def trier_par_theme(dest,src,ext_a_trier,choix):
+
     liste_fichiers = liste_fichiers_ext(src)
     for fichier in liste_fichiers:
         for ext in ext_a_trier:
             if fichier[1] == ext:
                 copier_ou_deplacer(choix, fichier, dest)
 
-def trier_par_motcle(dest,src):
+def trier_par_motcle(dest,src,choix):
     mot_a_trier = input("Entrez des mots clés à trier séparés par des virgules : ").split(",")
-    choix = int(input("Voulez vous : \n\t0 : Deplacer les fichiers \n\t1 : Copier les fichiers \nVotre réponse : "))
+
 
     liste_fichiers = liste_fichiers_ext(src)
 
@@ -165,6 +165,14 @@ ctk.set_default_color_theme("blue")
 
 # 4) - Choisir l'élément qui s'affiche par défaut
 def action(event):
+    fd = open("theme.csv","r")
+    lines = fd.readlines()
+    fd.close()
+    global ListeThemes
+    ListeThemesb = [l.split(" : ")[0] for l in lines]
+    for t in ListeThemesb:
+        if t not in ListeThemes:
+            Theme.add_command(label=name, name=name)
     if listeCombo.get() == "Extensions":
 
         Ext.place(x=20,y=140)
@@ -193,7 +201,7 @@ def dossier():
         rep_button_dest.place(x=200,y=160)
 
 
-def choix_theme():
+def choix_theme(rep_dest):
     theme = Theme.get()
     print(rep_dest)
     fd = open("theme.csv","r")
@@ -204,7 +212,7 @@ def choix_theme():
         if theme == t[0]:
             print(t[1])
             the = t[1].split()
-    trier_par_theme(rep_dest,rep_src,the)
+    trier_par_theme(rep_dest,rep_src,the,cpi())
 def rep1():
     global rep_dest
     rep_dest = filedialog.askdirectory()
@@ -213,15 +221,50 @@ def rep2():
     global rep_src
     rep_src = filedialog.askdirectory()
 
+def cpi():
+	if var2.get() == "Cp":
+		return 1
+	elif var2.get() == "Dp":	
+		return 2
+	else: 
+		return 0
+
+
+def Valider():
+    if not(rep_src and rep_dest):
+
+        print("Pas de chemin choisi")
+        return 0
+    if (cpi() == 0):
+        print("Copier pas coché")
+        return 0
+    else:	
+        print("BON")
+        return 1
+
+def present(nom):
+    ls = subprocess.check_output(["ls",rep_dest]).decode('utf-8').split('\n')
+    for d in ls:
+        if d == nom:
+            return 1
+    return 0
+
+
+
 def test_doss():
-    global rep_dest
-    if var1.get() == "Nv":
-        nom = exp_ndoss.get()
-        print(rep_dest)
-        os.mkdir(rep_dest+"/"+nom)
-        rep_dest = rep_dest+"/"+nom
-    
-    choix_theme()
+    if Valider():
+        global rep_dest
+        if var1.get() == "Nv":
+            nom = exp_ndoss.get()
+            print(rep_dest)
+            if present(nom):
+                err.place(x=250,y=350)
+            else:
+                err.place_forget()
+                os.mkdir(rep_dest+"/"+nom)
+                choix_theme(rep_dest+"/"+nom)
+        else:
+            choix_theme(rep_dest)
 
 
 
@@ -242,7 +285,7 @@ N_dossier = ctk.CTkEntry(master=root,textvariable=exp_ndoss,width=140)
 rep_button_dest = ctk.CTkButton(master=root,text="repertoire",command=rep1)
 rep_button_src = ctk.CTkButton(master=root,text="repertoire",command=rep2)
 rep_button_src.place(x=0,y=0)
-
+err = ctk.CTkLabel(master=root,text="Erreur, dossier existant",text_color="red")
 var1 = ctk.StringVar()
 D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier",hover=False,variable=var1,value = "Nv",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5,command = dossier)
 D1.place(x = 200,y=100)
