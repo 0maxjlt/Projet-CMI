@@ -1,1 +1,1 @@
-projes de adison et maxime! # Projet-CMI
+projes de addisson et maxim! # Projet-CMI
