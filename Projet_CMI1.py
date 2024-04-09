@@ -156,7 +156,8 @@ from tkinter import *
 from tkinter import ttk
 import customtkinter as ctk
 
-repertoire = filedialog.askdirectory()
+rep_src = ""
+rep_dest = ""
 root = ctk.CTk() 
 root.geometry('600x400')
 ctk.set_appearance_mode("dark")
@@ -164,29 +165,37 @@ ctk.set_default_color_theme("blue")
 
 # 4) - Choisir l'élément qui s'affiche par défaut
 def action(event):
-	
-	if listeCombo.get() == "Extensions":
-		
-		Ext.place(x=20,y=140)
-		MC.place_forget()
-		Theme.place_forget()
+    if listeCombo.get() == "Extensions":
 
-	elif listeCombo.get() == "Mot-clé":
-		
-		MC.place(x=20,y=140)
-		Theme.place_forget()
-		Ext.place_forget()
-	
-	else:
-		Theme.place(x=20,y=140)
-		Ext.place_forget()
-		MC.place_forget()
+        Ext.place(x=20,y=140)
+        MC.place_forget()
+        Theme.place_forget()
 
-def test(event):
-	print(xe.get())
+    elif listeCombo.get() == "Mot-clé":
 
-def choix_theme(event):
+        MC.place(x=20,y=140)
+        Theme.place_forget()
+        Ext.place_forget()
+
+    else:
+
+        Theme.place(x=20,y=140)
+        Ext.place_forget()
+        MC.place_forget()
+
+
+def dossier():
+    if var1.get() == "Nv":
+        N_dossier.place(x=200,y=190)
+        rep_button_dest.place(x=200,y=160)
+    else:
+        N_dossier.place_forget()
+        rep_button_dest.place(x=200,y=160)
+
+
+def choix_theme():
     theme = Theme.get()
+    print(rep_dest)
     fd = open("theme.csv","r")
     lines = fd.readlines()
     fd.close()
@@ -195,36 +204,61 @@ def choix_theme(event):
         if theme == t[0]:
             print(t[1])
             the = t[1].split()
-    trier_par_theme("test",repertoire,the)
+    trier_par_theme(rep_dest,rep_src,the)
+def rep1():
+    global rep_dest
+    rep_dest = filedialog.askdirectory()
+
+def rep2():
+    global rep_src
+    rep_src = filedialog.askdirectory()
+
+def test_doss():
+    global rep_dest
+    if var1.get() == "Nv":
+        nom = exp_ndoss.get()
+        print(rep_dest)
+        os.mkdir(rep_dest+"/"+nom)
+        rep_dest = rep_dest+"/"+nom
+    
+    choix_theme()
+
 
 
 OptionTri=["Extensions", "Thèmes","Mot-clé"]
 listeCombo = ctk.CTkOptionMenu(master=root, values=OptionTri, command=action)
 listeCombo.place(x = 0,y = 0)
-xe = StringVar()
-Ext = ctk.CTkEntry(master=root,textvariable=xe,width=140)
-ex = StringVar()
-MC = ctk.CTkEntry(master=root,textvariable=ex,width=140)
+exp_ext = StringVar()
+Ext = ctk.CTkEntry(master=root,textvariable=exp_ext,width=140)
+exp_mc = StringVar()
+MC = ctk.CTkEntry(master=root,textvariable=exp_mc,width=140)
 fd = open("theme.csv","r")
 lines = fd.readlines()
 fd.close()
 ListeThemes = [l.split(" : ")[0] for l in lines]
-Theme = ctk.CTkOptionMenu(master=root,values=ListeThemes, command = choix_theme,)
-Ext.bind("<Return>",test)
+Theme = ctk.CTkOptionMenu(master=root,values=ListeThemes)
+exp_ndoss = StringVar()
+N_dossier = ctk.CTkEntry(master=root,textvariable=exp_ndoss,width=140)
+rep_button_dest = ctk.CTkButton(master=root,text="repertoire",command=rep1)
+rep_button_src = ctk.CTkButton(master=root,text="repertoire",command=rep2)
+rep_button_src.place(x=0,y=0)
 
 var1 = ctk.StringVar()
-D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier",hover=False,variable=var1,value = "1",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier",hover=False,variable=var1,value = "Nv",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5,command = dossier)
 D1.place(x = 200,y=100)
-D2 = ctk.CTkRadioButton(master = root, text="Dossier existant",hover=False,variable=var1,value = "2",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+D2 = ctk.CTkRadioButton(master = root, text="Dossier existant",hover=False,variable=var1,value = "Ex",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5, command = dossier)
 D2.place(x = 200,y=130)
 label = ctk.CTkLabel(root)
 label.pack()
 listeCombo.place(x = 20,y = 100)
 var2 = ctk.StringVar()
-C1 = ctk.CTkRadioButton(master = root, text="Copier les fichier",hover=False,variable=var2,value = "1",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+C1 = ctk.CTkRadioButton(master = root, text="Copier les fichier",hover=False,variable=var2,value = "Cp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
 C1.place(x = 350,y=100)
-C2 = ctk.CTkRadioButton(master = root, text="Déplacer les fichier",hover=False,variable=var2,value = "2",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+C2 = ctk.CTkRadioButton(master = root, text="Déplacer les fichier",hover=False,variable=var2,value = "Dp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
 C2.place(x = 350,y=130)
+test_button = ctk.CTkButton(master=root,text="test",command = test_doss)
+test_button.place(x=500,y=300)
+
 
 
 
