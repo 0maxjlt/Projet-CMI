@@ -320,6 +320,8 @@ rep_button_dest = ctk.CTkButton(master=root,text="Chemin du dossier",command=rep
 rep_button_src = ctk.CTkButton(master=root,text="Quel dossier trier",command=rep2)
 rep_button_src.place(x=20,y=40)
 
+
+err = ctk.CTkLabel(master=root,text="Erreur, dossier existant",text_color="red")
 var1 = ctk.StringVar()
 D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier",hover=False,variable=var1,value = "Nv",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5,command = dossier)
 D1.place(x = 200,y=100)
