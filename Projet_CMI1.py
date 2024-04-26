@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import subprocess, sys, os
 from tkinter import filedialog
 from pathlib import Path
@@ -8,27 +11,27 @@ def liste_fichiers_ext(rep):
     b = a.decode('utf-8')
     c = []
 
-    for i in b.split():
+    for i in b.split("\n"):
         c.append(os.path.splitext(i))
     return c
 
-def copier_ou_deplacer(choix, fichier, nom_repertoire):
+def copier_ou_deplacer(choix, fichier, nom_repertoire,src):
    
 
     if choix == 2:
-        os.system("mv '" + fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        os.system("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        print("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
     elif choix == 1:
-        os.system("cp '" + fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        os.system("cp '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        print("cp '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
 
-def trier_par_extension(dest,src,choix):
-
-    ext_a_trier= input("Entrez une ou des extensions de la forme '.ext' : ").split()
+def trier_par_extension(dest,src,ext_a_trier,choix):
 
     liste_fichiers = liste_fichiers_ext(src)
     for fichier in liste_fichiers:
         for ext in ext_a_trier:
             if fichier[1] == ext:
-                copier_ou_deplacer(choix, fichier, dest)
+                copier_ou_deplacer(choix, fichier, dest,src)
 
 def trier_par_theme(dest,src,ext_a_trier,choix):
 
@@ -36,18 +39,17 @@ def trier_par_theme(dest,src,ext_a_trier,choix):
     for fichier in liste_fichiers:
         for ext in ext_a_trier:
             if fichier[1] == ext:
-                copier_ou_deplacer(choix, fichier, dest)
+                copier_ou_deplacer(choix, fichier, dest,src)
 
-def trier_par_motcle(dest,src,choix):
-    mot_a_trier = input("Entrez des mots clés à trier séparés par des virgules : ").split(",")
-
+def trier_par_motcle(dest,src,choix,mot_a_trier):
+    print("les mots : ",mot_a_trier)
 
     liste_fichiers = liste_fichiers_ext(src)
 
     for fichier in liste_fichiers:
         for mot in mot_a_trier:
             if mot in fichier[0]:
-                copier_ou_deplacer(choix, fichier, dest)
+                copier_ou_deplacer(choix, fichier, dest,src)
 
 def pres_theme(nom_th):
     fd = open("theme.csv","r")
@@ -98,62 +100,9 @@ def supprimer():
         fd.close()
 
 
-
-#
-#a = subprocess.check_output(["ls", repertoire])
-#b = a.decode('utf-8')
-#
-#if not("theme.csv" in b):
-#    os.system('touch theme.csv')
-#    
-#choix = int(input("0: Quitter, 1: Trier par extension, 2: Trier par thèmes, 3: Trier par mot clés : "))
-#
-#while(choix):
-#
-#    #Parametrage dossiers
-#
-#    nv_doss = int(input("0 : Nouveau dossier ou 1 : dossier existant : "))
-#    
-#    if nv_doss == 0:
-#        nom_repertoire = input("Donnez un nom pour le dossier : ")
-#        os.mkdir(nom_repertoire)
-#    if nv_doss == 1:
-#        nom_repertoire = input("Entrez le nom du dossier : ")
-#    
-#
-#
-#    #Utilisation de la bonne option
-#
-#    if choix == 1:
-#        trier_par_extension(nom_repertoire)
-#
-#
-#    elif choix == 2:
-#        
-#        fd = open("theme.csv", "r")
-#        th = input("0 : Nouveau theme ou 1 : Deja existant : ")
-#        theme2 = []
-#        if th == '0':
-#            trier_par_theme(nom_repertoire, add_theme())
-#        else: 
-#            print("Liste des thèmes disponibles : ")
-#            for line in fd.readlines():
-#                print("\t- ", end = "")
-#                theme2.append(line.split(" : "))
-#                print(line.split(" : ")[0])
-#
-#            theme = input("Quel thème : ")
-#            for t in theme2:
-#                if t[0] == theme:
-#                    trier_par_theme(nom_repertoire, t[1].split())
-#
-#    elif choix == 3:
-#        trier_par_motcle(nom_repertoire)
-#
-#    #choix = int(input("0: Quitter, 1: Trier par extension, 2: Trier par thèmes, 3: Trier par mot clés : "))
-
 from tkinter import *
 from tkinter import ttk
+
 import customtkinter as ctk
 
 rep_src = ""
@@ -163,16 +112,18 @@ root.geometry('600x400')
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-# 4) - Choisir l'élément qui s'affiche par défaut
+
+
+
 def action(event):
     fd = open("theme.csv","r")
     lines = fd.readlines()
     fd.close()
     global ListeThemes
     ListeThemesb = [l.split(" : ")[0] for l in lines]
-    for t in ListeThemesb:
-        if t not in ListeThemes:
-            Theme.add_command(label=name, name=name)
+    if ListeThemesb != ListeThemes:
+        ListeThemes = ListeThemesb
+        Theme.configure(values=ListeThemes)
     if listeCombo.get() == "Extensions":
 
         Ext.place(x=20,y=140)
@@ -191,15 +142,19 @@ def action(event):
         Ext.place_forget()
         MC.place_forget()
 
-
+#####
 def dossier():
     if var1.get() == "Nv":
         N_dossier.place(x=200,y=190)
         rep_button_dest.place(x=200,y=160)
-    else:
+        return 1
+    elif var1.get() == "Ex":
         N_dossier.place_forget()
         rep_button_dest.place(x=200,y=160)
-
+        return 2
+    else:
+        return 0
+######
 
 def choix_theme(rep_dest):
     theme = Theme.get()
@@ -213,6 +168,13 @@ def choix_theme(rep_dest):
             print(t[1])
             the = t[1].split()
     trier_par_theme(rep_dest,rep_src,the,cpi())
+
+def choix_ext(rep_dest):
+    trier_par_extension(rep_dest,rep_src,Ext.get().split(),cpi())
+
+def choix_motcle(rep_dest):
+    trier_par_motcle(rep_dest,rep_src,cpi(),MC.get().split())
+
 def rep1():
     global rep_dest
     rep_dest = filedialog.askdirectory()
@@ -229,7 +191,9 @@ def cpi():
 	else: 
 		return 0
 
+#######
 
+#######
 def Valider():
     if not(rep_src and rep_dest):
 
@@ -264,13 +228,19 @@ def test_doss():
                 os.mkdir(rep_dest+"/"+nom)
                 choix_theme(rep_dest+"/"+nom)
         else:
-            choix_theme(rep_dest)
+            if listeCombo.get() == "Thèmes":
+                choix_theme()
+            elif listeCombo.get() == "Extensions":
+                choix_ext()
+            else:
+                choix_motcle()
 
 
 
-OptionTri=["Extensions", "Thèmes","Mot-clé"]
-listeCombo = ctk.CTkOptionMenu(master=root, values=OptionTri, command=action)
+OptionTri = ["Extensions","Thèmes","Mot-clé"]
+listeCombo = ctk.CTkOptionMenu(master=root, command=action, values=OptionTri)
 listeCombo.place(x = 0,y = 0)
+
 exp_ext = StringVar()
 Ext = ctk.CTkEntry(master=root,textvariable=exp_ext,width=140)
 exp_mc = StringVar()
