@@ -109,3 +109,63 @@ root = ctk.CTk()
 root.geometry('1280x720+320+180') 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
+
+def action(event):
+    fd = open("theme.csv","r")
+    lines = fd.readlines()
+    fd.close()
+    global ListeThemes
+    ListeThemesb = [l.split(" : ")[0] for l in lines]
+    if ListeThemesb != ListeThemes:
+        ListeThemes = ListeThemesb
+        Theme.configure(values=ListeThemes)
+    if listeCombo.get() == "Extensions":
+
+        Ext.place(x=20,y=140)
+        MC.place_forget()
+        Theme.place_forget()
+
+    elif listeCombo.get() == "Mot-clé":
+
+        MC.place(x=20,y=140)
+        Theme.place_forget()
+        Ext.place_forget()
+
+    else:
+
+        Theme.place(x=20,y=140)
+        Ext.place_forget()
+        MC.place_forget()
+
+
+def dossier():
+    if var1.get() == "Nv":
+        N_dossier.place(x=200,y=190)
+        rep_button_dest.place(x=200,y=160)
+    else:
+        N_dossier.place_forget()
+        rep_button_dest.place(x=200,y=160)
+
+
+def choix_theme():
+    theme = Theme.get()
+    print(rep_dest)
+    fd = open("theme.csv","r")
+    lines = fd.readlines()
+    fd.close()
+    ListeThemes = [l.split(" : ") for l in lines]
+    for t in ListeThemes:
+        if theme == t[0]:
+            print(t[1])
+            the = t[1].split()
+    trier_par_theme(rep_dest,rep_src,the,cpi())
+
+def choix_ext():
+    trier_par_extension(rep_dest,rep_src,Ext.get().split(),cpi())
+
+def choix_motcle():
+    trier_par_motcle(rep_dest,rep_src,cpi(),MC.get().split())
+
+def rep1():
+    global rep_dest
+    rep_dest = filedialog.askdirectory()
