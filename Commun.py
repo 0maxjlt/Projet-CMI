@@ -6,6 +6,12 @@ from tkinter import filedialog
 from pathlib import Path
 from tkinter import *
 import customtkinter as ctk
+import threading
+import sys
+import time
+import tkinter
+import tkinter.messagebox
+import customtkinter
 
 def liste_fichiers_ext(rep):
 
@@ -258,3 +264,117 @@ def test_doss():
                 choix_ext()
             else:
                 choix_motcle()
+
+frames = [tkinter.PhotoImage(file='test2.gif', format='gif -index %i'%(i)) for i in range(62)]
+
+def center_window(win):
+    win.wait_visibility() # make sure the window is ready
+
+
+def M_95(n=0, top=None, lbl=None):
+    # Play GIF (file name = m95.gif) in a 320x320 tkinter window
+    # Play GIF concurrently with the loading animation below
+    # Close tkinter window after play
+    global process_is_alive  # used in loadingAnimation()
+     # make one cycle of animation around 4 secs
+    num_cycles = 1
+    count = len(frames) * num_cycles
+    delay = 1500 // count
+    if n == 0:
+        root.withdraw()
+        top = tkinter.Toplevel()
+        lbl = tkinter.Label(top, image=frames[0])
+        lbl.pack()
+        center_window(top)
+        process_is_alive = True
+    if n < count-1:
+        lbl.config(image=frames[n%len(frames)])
+        lbl.after(delay, M_95, n+1, top, lbl)
+    else:
+        top.destroy()
+        root.deiconify()
+        process_is_alive = False
+
+M_95()
+
+OptionTri=["Extensions", "Thèmes","Mot-clé"]
+listeCombo = ctk.CTkOptionMenu(master=root, values=OptionTri, command=action)
+listeCombo.place(x = 0,y = 0)
+
+exp_ext = StringVar()
+Ext = ctk.CTkEntry(master=root,textvariable=exp_ext,width=140)
+
+exp_mc = StringVar()
+MC = ctk.CTkEntry(master=root,textvariable=exp_mc,width=140)
+
+fd = open("theme.csv","r")
+lines = fd.readlines()
+fd.close()
+ListeThemes = [l.split(" : ")[0] for l in lines]
+Theme = ctk.CTkOptionMenu(master=root,values=ListeThemes)
+
+exp_ndoss = StringVar()
+N_dossier = ctk.CTkEntry(master=root,textvariable=exp_ndoss,width=140)
+rep_button_dest = ctk.CTkButton(master=root,text="Chemin du dossier",command=rep1)
+rep_button_src = ctk.CTkButton(master=root,text="Quel dossier trier",command=rep2)
+rep_button_src.place(x=20,y=40)
+
+var1 = ctk.StringVar()
+D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier",hover=False,variable=var1,value = "Nv",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5,command = dossier)
+D1.place(x = 200,y=100)
+D2 = ctk.CTkRadioButton(master = root, text="Dossier existant",hover=False,variable=var1,value = "Ex",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5, command = dossier)
+D2.place(x = 200,y=130)
+
+listeCombo.place(x = 20,y = 100)
+var2 = ctk.StringVar()
+C1 = ctk.CTkRadioButton(master = root, text="Copier les fichier",hover=False,variable=var2,value = "Cp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+C1.place(x = 350,y=100)
+C2 = ctk.CTkRadioButton(master = root, text="Déplacer les fichier",hover=False,variable=var2,value = "Dp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
+C2.place(x = 350,y=130)
+test_button = ctk.CTkButton(master=root,text="Valider",command = test_doss)
+test_button.place(x=500,y=300)
+
+
+label3 = ctk.CTkLabel(master=root,
+                               textvariable=text_var3,
+                               corner_radius=8,
+                               justify = 'left',
+                               text_color = "seaGreen1",
+                               font = ('System', 22))
+
+text_var3.set("Informations générales")
+label3.place(x = 30, y = 250)
+
+
+text_var = tk.StringVar()
+
+frame = ctk.CTkScrollableFrame(root, height = 150, width= 200)
+frame._scrollbar.configure(height = 0)
+
+label = ctk.CTkLabel(master=frame,
+                               textvariable=text_var,
+                               corner_radius=8,
+                               justify = 'left',
+                               text_color = "green2",
+                               font = ('System', 15))
+text_var.set("Votre dossier contient : \n Pas de dossier choisi" )
+label.configure(text_color = "red2")
+label.pack()
+frame.place(x = 60, y = 300)
+
+
+text_var2 = tk.StringVar()
+label2 = ctk.CTkLabel(master=root,
+                               textvariable=text_var2,
+                               corner_radius=8,
+                               justify = 'left',
+                               text_color = "Gold",
+                               font = ('System', 15))
+
+
+text_var3 = tk.StringVar()
+
+nom_dossier_src = rep_src.split('/')[-1]
+
+root.mainloop()
+
