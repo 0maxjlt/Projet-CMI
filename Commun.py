@@ -208,3 +208,53 @@ def rep2():
     label2.pack()
     label2.place(x = 30, y = 550)
 
+
+def cpi():
+	if var2.get() == "Cp":
+		return 1
+	elif var2.get() == "Dp":	
+		return 2
+	else: 
+		return 0
+
+
+def Valider():
+    if not(rep_src and rep_dest):
+
+        print("Pas de chemin choisi")
+        return 0
+    if (cpi() == 0):
+        print("Copier pas coché")
+        return 0
+    else:	
+        print("BON")
+        return 1
+
+def present(nom):
+    ls = subprocess.check_output(["ls",rep_dest]).decode('utf-8').split('\n')
+    for d in ls:
+        if d == nom:
+            return 1
+    return 0
+
+
+
+def test_doss():
+    if Valider():
+        global rep_dest
+        if var1.get() == "Nv":
+            nom = exp_ndoss.get()
+            print(rep_dest)
+            if present(nom):
+                err.place(x=250,y=350)
+            else:
+                err.place_forget()
+                os.mkdir(rep_dest+"/"+nom)
+                choix_theme(rep_dest+"/"+nom)
+        else:
+            if listeCombo.get() == "Thèmes":
+                choix_theme()
+            elif listeCombo.get() == "Extensions":
+                choix_ext()
+            else:
+                choix_motcle()
