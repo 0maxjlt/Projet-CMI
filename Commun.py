@@ -12,6 +12,7 @@ import time
 import tkinter
 import tkinter.messagebox
 import customtkinter
+from collections import Counter
 
 def liste_fichiers_ext(rep):
 
@@ -334,7 +335,7 @@ C2.place(x = 350,y=130)
 test_button = ctk.CTkButton(master=root,text="Valider",command = test_doss)
 test_button.place(x=500,y=300)
 
-
+text_var3 = StringVar()
 label3 = ctk.CTkLabel(master=root,
                                textvariable=text_var3,
                                corner_radius=8,
@@ -346,7 +347,7 @@ text_var3.set("Informations générales")
 label3.place(x = 30, y = 250)
 
 
-text_var = tk.StringVar()
+text_var = StringVar()
 
 frame = ctk.CTkScrollableFrame(root, height = 150, width= 200)
 frame._scrollbar.configure(height = 0)
@@ -363,16 +364,13 @@ label.pack()
 frame.place(x = 60, y = 300)
 
 
-text_var2 = tk.StringVar()
+text_var2 = StringVar()
 label2 = ctk.CTkLabel(master=root,
                                textvariable=text_var2,
                                corner_radius=8,
                                justify = 'left',
                                text_color = "Gold",
                                font = ('System', 15))
-
-
-text_var3 = tk.StringVar()
 
 nom_dossier_src = rep_src.split('/')[-1]
 
