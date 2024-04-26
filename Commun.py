@@ -1,10 +1,11 @@
-
 #!/usr/bin/env python3
 
 
 import subprocess, sys, os
 from tkinter import filedialog
 from pathlib import Path
+from tkinter import *
+import customtkinter as ctk
 
 def liste_fichiers_ext(rep):
 
@@ -18,7 +19,6 @@ def liste_fichiers_ext(rep):
 
 def copier_ou_deplacer(choix, fichier, nom_repertoire,src):
    
-
     if choix == 2:
         os.system("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
         print("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
@@ -99,3 +99,13 @@ def supprimer():
                 a += lines[k]
         fd.write(a)
         fd.close()
+
+rep_src = ""
+rep_dest = ""
+
+#création interface graphique
+
+root = ctk.CTk() 
+root.geometry('1280x720+320+180') 
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
