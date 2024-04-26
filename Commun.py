@@ -169,3 +169,42 @@ def choix_motcle():
 def rep1():
     global rep_dest
     rep_dest = filedialog.askdirectory()
+    
+def rep2():
+    global rep_src
+    rep_src = filedialog.askdirectory()
+
+    global info
+
+    liste_ls = liste_fichiers_ext(rep_src)
+    liste_dossiers = []
+    liste_fichiers = []
+    nb_dossiers = 0
+    nb_fichiers = 0
+    
+    for fichier in liste_ls:
+        if fichier[1] == "":
+            liste_dossiers.append(fichier)
+            nb_dossiers = nb_dossiers + 1
+       
+        if fichier[1] != "":
+            liste_fichiers.append(fichier[1])
+            nb_fichiers += 1
+
+    dico = (dict(Counter(liste_fichiers)))
+
+    strInfo = ""
+   
+    for cle,values in dico.items():
+        strInfo += ("{0}  :  {1} \n".format(cle, values))
+    
+    label.configure(text_color = "green2")
+    info = "Votre dossier contient : \n\n" + strInfo
+    text_var.set(info ) 
+    label.pack()
+
+    strInfo2 = "Dossiers : " + str(nb_dossiers) + "\nFichiers : " + str(nb_fichiers)
+    text_var2.set(strInfo2)
+    label2.pack()
+    label2.place(x = 30, y = 550)
+
