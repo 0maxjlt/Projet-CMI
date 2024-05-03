@@ -16,48 +16,66 @@ from collections import Counter
 
 def liste_fichiers_ext(rep):
 
-    a = subprocess.check_output(["ls",rep])
-    b = a.decode('utf-8')
-    c = []
-
-    for i in b.split("\n"):
-        c.append(os.path.splitext(i))
+    c = {}
+    if rec.get() == "on":
+        path=""
+        a = subprocess.check_output(["ls","-R",rep]).decode("utf-8")
+        for fic in a.split("\n"):
+            if os.path.isdir(fic[:-1]):
+                path = fic[:-1]
+                c[path] = []
+        for p in c.keys():
+            fics = subprocess.check_output(["ls","-p",p]).decode("utf-8").split('\n')
+            for f in fics:
+                if not f.endswith('/'):
+                    c[p].append(os.path.splitext(f))
+    
+    else:
+        path = subprocess.check_output(["pwd",rep]).decode("utf-8")[:-1]
+        a = subprocess.check_output(["ls",rep]).decode("utf-8")
+        c[path] = []
+        for fic in a.split("\n"):
+            c[path].append(os.path.splitext(fic))
     return c
+
 
 def copier_ou_deplacer(choix, fichier, nom_repertoire,src):
    
     if choix == 2:
-        os.system("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
-        print("mv '" +src+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        os.system("mv -n '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
     elif choix == 1:
-        os.system("cp '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
-        print("cp '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
+        os.system("cp -n '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
 
 def trier_par_extension(dest,src,ext_a_trier,choix):
 
     liste_fichiers = liste_fichiers_ext(src)
-    for fichier in liste_fichiers:
-        for ext in ext_a_trier:
-            if fichier[1] == ext:
-                copier_ou_deplacer(choix, fichier, dest,src)
+    for path in liste_fichiers.keys():
+        for fichier in liste_fichiers[path]:
+            for ext in ext_a_trier:
+                if os.path.isfile(path+"/"+fichier[0]+fichier[1]):
+                    if fichier[1] == ext:
+                        copier_ou_deplacer(choix, fichier, dest,path)
 
 def trier_par_theme(dest,src,ext_a_trier,choix):
 
     liste_fichiers = liste_fichiers_ext(src)
-    for fichier in liste_fichiers:
-        for ext in ext_a_trier:
-            if fichier[1] == ext:
-                copier_ou_deplacer(choix, fichier, dest,src)
+    for path in liste_fichiers.keys():
+        for fichier in liste_fichiers[path]:
+            for ext in ext_a_trier:
+                if os.path.isfile(path+"/"+fichier[0]+fichier[1]):
+                    if fichier[1] == ext:
+                        copier_ou_deplacer(choix, fichier, dest,path)
 
 def trier_par_motcle(dest,src,choix,mot_a_trier):
-    print("les mots : ",mot_a_trier)
 
     liste_fichiers = liste_fichiers_ext(src)
 
-    for fichier in liste_fichiers:
-        for mot in mot_a_trier:
-            if mot in fichier[0]:
-                copier_ou_deplacer(choix, fichier, dest,src)
+    for path in liste_fichiers.keys():
+        for fichier in liste_fichiers[path]:
+            if os.path.isfile(path+"/"+fichier[0]+fichier[1]):
+                for mot in mot_a_trier:
+                    if mot in fichier[0]:
+                        copier_ou_deplacer(choix, fichier, dest,path)
 
 def pres_theme(nom_th):
     fd = open("theme.csv","r")
