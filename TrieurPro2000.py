@@ -14,9 +14,11 @@ import tkinter.messagebox
 import customtkinter
 from collections import Counter
 
+# renvoie un dictionnaire sous la forme : {chemindudossier:[(nomfichier,extension),...],...}
 def liste_fichiers_ext(rep):
 
     c = {}
+	# vérifie quel mode du ls utiliser (récursif ou pas)
     if rec.get() == "on":
         path=""
         a = subprocess.check_output(["ls","-R",rep]).decode("utf-8")
@@ -38,7 +40,7 @@ def liste_fichiers_ext(rep):
             c[path].append(os.path.splitext(fic))
     return c
 
-
+# utilise la bonne commande en fonction du choix de l'utilisateur
 def copier_ou_deplacer(choix, fichier, nom_repertoire,src):
    
     if choix == 2:
@@ -46,6 +48,7 @@ def copier_ou_deplacer(choix, fichier, nom_repertoire,src):
     elif choix == 1:
         os.system("cp -n '" +src+"/"+ fichier[0]+fichier[1] + "' '" + nom_repertoire + "'")
 
+# tri en fonction des extensions
 def trier_par_extension(dest,src,ext_a_trier,choix):
 
     liste_fichiers = liste_fichiers_ext(src)
@@ -56,6 +59,7 @@ def trier_par_extension(dest,src,ext_a_trier,choix):
                     if fichier[1] == ext:
                         copier_ou_deplacer(choix, fichier, dest,path)
 
+# tri en focntion d'un thème choisi parmis ceux présents dans le fichier thème.csv
 def trier_par_theme(dest,src,ext_a_trier,choix):
 
     liste_fichiers = liste_fichiers_ext(src)
@@ -66,6 +70,7 @@ def trier_par_theme(dest,src,ext_a_trier,choix):
                     if fichier[1] == ext:
                         copier_ou_deplacer(choix, fichier, dest,path)
 
+# tri avec une partie de mot( ou mot complet) donné par l'utilisateur
 def trier_par_motcle(dest,src,choix,mot_a_trier):
 
     liste_fichiers = liste_fichiers_ext(src)
@@ -77,6 +82,7 @@ def trier_par_motcle(dest,src,choix,mot_a_trier):
                     if mot in fichier[0]:
                         copier_ou_deplacer(choix, fichier, dest,path)
 
+# vérifie que le nom du thème que l'utilisateur veut ajouter n'est pas déjà présent dans le fichier theme.csv
 def pres_theme(nom_th):
     fd = open("theme.csv","r")
     lines = fd.readlines()
@@ -90,6 +96,7 @@ def pres_theme(nom_th):
             return True
     return False
 
+# ajout d'un thème en fonction des paramètres donnés par l'utilisateur
 def add_theme(exts, nom_theme):
     
     extension = exts.split()
@@ -115,6 +122,7 @@ def add_theme(exts, nom_theme):
 
     return extension
 
+# supprime un thème du fichier theme.csv
 def supprimer(theme):
 
 
@@ -153,6 +161,7 @@ root.geometry('1280x720+320+180')
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
+# ajoute un widget différent en fonction du choix du mode de tri choisi
 def action(event):
     fd = open("theme.csv","r")
     lines = fd.readlines()
@@ -180,7 +189,7 @@ def action(event):
         Ext.place_forget()
         MC.place_forget()
 
-
+# ajuste les widget sur l'interface en fonction du choix de dossier de destination
 def dossier():
     if var1.get() == "Nv":
         N_dossier.place(x=220,y=130)
@@ -189,7 +198,7 @@ def dossier():
         N_dossier.place_forget()
         rep_button_dest.place(x=220,y=100)
 
-
+# donne les bons paramètres à la fonction trier_par_theme
 def choix_theme(rep_dest):
     theme = Theme.get()
     print(rep_dest)
@@ -202,17 +211,18 @@ def choix_theme(rep_dest):
             print(t[1])
             the = t[1].split()
     trier_par_theme(rep_dest,rep_src,the,cpi())
-
+# donne les bons paramètres à la fonction trier_par_extension
 def choix_ext(rep_dest):
     trier_par_extension(rep_dest,rep_src,Ext.get().split(),cpi())
-
+# donne les bons paramètres à la fonction trier_par_motcle
 def choix_motcle(rep_dest):
     trier_par_motcle(rep_dest,rep_src,cpi(),MC.get().split())
 
+# sauvgarde le répertoire source
 def rep1():
     global rep_dest
     rep_dest = filedialog.askdirectory()
-    
+# sauvegarde le répertoire de destination et affiche sur l'interface des infos suplémentaire sur le contenu du dossier
 def rep2():
     global rep_src
     rep_src = filedialog.askdirectory()
@@ -289,8 +299,8 @@ def rep2():
         label_taille_src.place(x = 95, y = 600)
 
 
-
-def cpi():
+# regarde quelle mode de déplacement de fichier est séléctionné
+def cpdpi():
 	if var2.get() == "Cp":
 		return 1
 	elif var2.get() == "Dp":	
@@ -381,7 +391,7 @@ def check_rec():
 
 
 
-###
+# vérifie plusieurs conditions et renvoie un booléen
 def Valider():
 
     erreurs = ""
@@ -420,8 +430,8 @@ def Valider():
     label_err_valider.place(x = 500, y = 200)
 
     return 0    
-###
 
+# vérifie, si l'option nouveau dossier est séléctionnée, que le nom de dossier n'est pas déjà existant 
 def present(nom):
     ls = subprocess.check_output(["ls",rep_dest]).decode('utf-8').split('\n')
     for d in ls:
@@ -430,7 +440,7 @@ def present(nom):
     return 0
 
 
-
+# appelle la fonction valider puis execute le bon mode de tri avec les bonnes option si valider est juste
 def test_doss():
     if Valider():
         global rep_dest
@@ -462,7 +472,7 @@ frames = [tkinter.PhotoImage(file='test2.gif', format='gif -index %i'%(i)) for i
 def center_window(win):
     win.wait_visibility() # make sure the window is ready
 
-
+# écran de chargement
 def chargement(n=0, top=None, lbl=None):
     # Play GIF (file name = m95.gif) in a 320x320 tkinter window
     # Play GIF concurrently with the loading animation below
@@ -489,59 +499,69 @@ def chargement(n=0, top=None, lbl=None):
 
 chargement()
 
-def actu():
-    Theme2.configure(value=ListeThemes)
 
 
-
+# police d'écriture
 font=("System", 15)
 
+# configuration du widget de mode de tri
 OptionTri=["Extensions", "Thèmes","Mot-clé"]
 ModeDeTri = ctk.CTkOptionMenu(master=root, values=OptionTri, command=action, width=140, dropdown_font = font, font = font)
-ModeDeTri.place(x = 0,y = 0)
+ModeDeTri.place(x = 20,y = 100)
 ModeDeTri.set("Mode de tri")
 
+# configuration du widget d'extension 
 exp_ext = StringVar()
 Ext = ctk.CTkEntry(master=root,textvariable=exp_ext,width=140, font = font)
-
+# configuration du widget de mot-clé
 exp_mc = StringVar()
 MC = ctk.CTkEntry(master=root,textvariable=exp_mc, width=140, font = font)
 
+# configuration du widget de thème
 fd = open("theme.csv","r")
 lines = fd.readlines()
 fd.close()
 ListeThemes = [l.split(" : ")[0] for l in lines]
 Theme = ctk.CTkOptionMenu(master=root,values=ListeThemes, width=160, dropdown_font = font, font = font)
-Theme.set("Choix thème")
 
+# widget nouveau dossier
 exp_ndoss = StringVar()
 N_dossier = ctk.CTkEntry(master=root,textvariable=exp_ndoss,width=157, font = font)
+
+# widget pour le dossier de destination
 rep_button_dest = ctk.CTkButton(master=root,text="Chemin du dossier",command=rep1, width=140, font = font)
+
+# widget pour le dossier source
 rep_button_src = ctk.CTkButton(master=root,text="Quel dossier trier",command=rep2, width=140, font = font)
 rep_button_src.place(x=20,y=40)
 
-
+# widget qui affiche les erreurs si il y en a
 err = ctk.CTkLabel(master=root,text="Erreur, dossier existant",text_color="red")
+
+# les 2 boutons radio concernant les options de "nouveau dossier" et "dossier existant"
 var1 = ctk.StringVar()
 D1 = ctk.CTkRadioButton(master = root, text="Nouveau dossier", width=140, font = font ,hover=False,variable=var1,value = "Nv",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5,command = dossier)
 D1.place(x = 220,y=30)
 D2 = ctk.CTkRadioButton(master = root, text="Dossier existant", width=140, font = font ,hover=False,variable=var1,value = "Ex",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5, command = dossier)
 D2.place(x = 220,y=60)
 
-ModeDeTri.place(x = 20,y = 100)
+# les 2 boutons radio concernant les options de "copier" et "déplacer"
 var2 = ctk.StringVar()
 C1 = ctk.CTkRadioButton(master = root, text="Copier les fichier", width=140, font = font , hover=False,variable=var2,value = "Cp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
 C1.place(x = 400,y=30)
 C2 = ctk.CTkRadioButton(master = root, text="Déplacer les fichier", width=140, font = font ,hover=False,variable=var2,value = "Dp",radiobutton_width=15,radiobutton_height=15,border_width_checked=3.5)
 C2.place(x = 400,y=60)
-test_button = ctk.CTkButton(master=root,text="Valider",command = test_doss, font = font)
-test_button.place(x=900,y=100)
 
-check_var = StringVar().set("on")
-rec = customtkinter.CTkCheckBox(master=root, text="Parcourir sous dossiers", width=140    , font = font ,variable=check_var, onvalue="on", offvalue="off",command=check_rec)
+# bouton valider
+val_button = ctk.CTkButton(master=root,text="Valider",command = test_doss, font = font)
+val_button.place(x=900,y=100)
+
+# checkbox pour le mode de la commande "ls"
+recursif = StringVar()
+rec = customtkinter.CTkCheckBox(master=root, text="Parcourir sous dossiers", width=140    , font = font ,variable=recursif, onvalue="on", offvalue="off",command=check_rec)
 rec.place(x=600,y=100)
 
-
+# configuration des widgets pour les differentes informations sur le dossier
 text_info_gen = StringVar()
 label_info_gen = ctk.CTkLabel(master=root,
                                textvariable=text_info_gen,
@@ -556,9 +576,11 @@ label_info_gen.place(x = 35, y = 250)
 
 text_info_src = StringVar()
 
+# canvas pour y mettre les nombres de fichiers en fonction de l'extension
 frame = ctk.CTkScrollableFrame(root, height = 150, width= 200)
 frame._scrollbar.configure(height = 0)
 
+# texte des différentes infos misent dans le canvas
 label_info_src = ctk.CTkLabel(master=frame,
                                textvariable=text_info_src,
                                justify = 'left',
@@ -595,6 +617,7 @@ label_taille_src = ctk.CTkLabel(master=root,
                                text_color = "DarkOrange1",
                                font = ('System', 15))
 
+# message d'erreur (ou "BON" s'il n'y en à pas) suite à un clic sur le bouton valider
 text_err_valider = StringVar()
 label_err_valider = ctk.CTkLabel(master=root,
                                textvariable=text_err_valider,
@@ -603,7 +626,7 @@ label_err_valider = ctk.CTkLabel(master=root,
                                font = ('System', 15))
 
 
-
+# execute la fonction add_theme avec les bons paramètres suite a un clic sur le bouton envoyer en bas de la colonne d'ajout
 def valider_addtheme():
 
     
@@ -619,8 +642,7 @@ def valider_addtheme():
     else:
         print("Pas renseigné")
        
-### Ajout theme
-
+# configuration des différents widget nécessaire à l'implementation de l'ajout d'un thème (texte, bouton et zone de saisie)
 text_addtheme = StringVar()
 entry_addtheme = ctk.CTkEntry(master=root,textvariable=text_addtheme,width=140, font = font)
 
@@ -675,8 +697,7 @@ label_nomtheme_affiche = ctk.CTkLabel(master=root,
 text_nomtheme_affiche.set("Entrez un nom de thème")
 label_nomtheme_affiche.place(x = 500, y = 360)
 
-#Supprimer theme
-
+# execute supprimer avec les bons paramètre suite a un clic sur le bouton
 def Valider_supp_theme():
     
     if Theme2.get() != "":
@@ -688,6 +709,7 @@ def Valider_supp_theme():
         print("pas choisi")
 
 
+# configuration des widget nécessaire 
 btn_valider_addtheme = ctk.CTkButton(master=root,text="Envoyer",command=Valider_supp_theme, width=140, font = font)
 btn_valider_addtheme.place(x= 900, y = 530)
 
@@ -715,7 +737,7 @@ label_supp_theme_2 = ctk.CTkLabel(master=root,
 text_supp_theme_2.set("Supprimer Thème")
 label_supp_theme_2.place(x = 900, y = 300)
 
-
+# personalisation de la fenêtre pour avoir des séparation entre les différentes partie de l'interface
 text_ligne = StringVar()
 label_ligne = ctk.CTkLabel(master=root,
                                textvariable=text_ligne,
