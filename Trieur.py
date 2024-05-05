@@ -717,6 +717,7 @@ def Valider_supp_theme():
         supprimer(theme)
         Theme2.configure(values=ListeThemes)
         Theme2.set("Choisir")
+	    Theme.configure(values=ListeThemes)
     else:
         print("pas choisi")
 
