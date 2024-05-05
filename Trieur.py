@@ -462,7 +462,7 @@ def test_doss():
             else:
                 choix_motcle(rep_dest)
 
-frames = [tkinter.PhotoImage(file='test2.gif', format='gif -index %i'%(i)) for i in range(62)]
+frames = [tkinter.PhotoImage(file='animation.gif', format='gif -index %i'%(i)) for i in range(62)]
 
 def center_window(win):
     win.wait_visibility() # make sure the window is ready
