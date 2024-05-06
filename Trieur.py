@@ -93,7 +93,6 @@ def pres_theme(nom_th):
         li.append(l.split(" : "))
     for n in li:
         if n[0] == nom_th:
-            print("nom de theme déjà présent")
             return True
     return False
 
@@ -109,7 +108,6 @@ def add_theme(exts, nom_theme):
         theme += '\n'
         fd.write(theme)
         fd.close()
-        print(theme)
     
             
         fd = open("theme.csv","r")
@@ -117,7 +115,6 @@ def add_theme(exts, nom_theme):
         fd.close()
         global ListeThemes
         ListeThemes = [l.split(" : ")[0] for l in lines]
-        print(ListeThemes)
 
 
 
@@ -139,7 +136,6 @@ def supprimer(theme):
     for line in lines : 
             lines_s.append(line.split(" : "))
     for k in range(len(lines_s)):
-        print(lines_s[k][0],end="")
         if lines_s[k][0]!=sup:
             a += lines[k]
     fd.write(a)
@@ -150,7 +146,6 @@ def supprimer(theme):
     fd.close()
     global ListeThemes
     ListeThemes = [l.split(" : ")[0] for l in lines]
-    print(ListeThemes)
 
 
 rep_src = ""
@@ -204,14 +199,12 @@ def dossier():
 # donne les bons paramètres à la fonction trier_par_theme
 def choix_theme(rep_dest):
     theme = Theme.get()
-    print(rep_dest)
     fd = open("theme.csv","r")
     lines = fd.readlines()
     fd.close()
     ListeThemes = [l.split(" : ") for l in lines]
     for t in ListeThemes:
         if theme == t[0]:
-            print(t[1])
             the = t[1].split()
     trier_par_theme(rep_dest,rep_src,the,cpi())
 
@@ -450,17 +443,17 @@ def present(nom):
 
 # appelle la fonction valider puis execute le bon mode de tri avec les bonnes option si valider est juste
 def test_doss():
-    print(Valider())
+    
     if Valider():
         global rep_dest
         if var1.get() == "Nv":
             nom = exp_ndoss.get()
-            print(rep_dest)
+           
             if present(nom):
                 err.place(x=250,y=350)
             else:
 
-                print(ModeDeTri.get())
+                
                 err.place_forget()
                 os.mkdir(rep_dest+"/"+nom)
                 if ModeDeTri.get() == "Thèmes":
@@ -471,7 +464,7 @@ def test_doss():
                     choix_motcle(rep_dest+"/"+nom)
 
         else:
-            print(ModeDeTri.get())
+           
             if ModeDeTri.get() == "Thèmes":
                 choix_theme(rep_dest)
             elif ModeDeTri.get() == "Extensions":
@@ -650,8 +643,7 @@ def valider_addtheme():
         add_theme(exts, nom_theme)
         Theme2.configure(values=ListeThemes)
         Theme.configure(values=ListeThemes)
-    else:
-        print("Pas renseigné")
+
        
 
 # configuration des différents widget nécessaire à l'implementation de l'ajout d'un thème (texte, bouton et zone de saisie)
@@ -718,8 +710,7 @@ def Valider_supp_theme():
         Theme2.configure(values=ListeThemes)
         Theme2.set("Choisir")
 	    Theme.configure(values=ListeThemes)
-    else:
-        print("pas choisi")
+
 
 # configuration des widget nécessaire 
 btn_valider_addtheme = ctk.CTkButton(master=root,text="Envoyer",command=Valider_supp_theme, width=140, font = font)
